@@ -8,6 +8,11 @@ class TempStorageService {
     return '${dir.path}/$filename';
   }
 
+  static Future<File> _getFile(String fileName) async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/$fileName');
+  }
+
   // ======= LOGIN / REGISTRATION =======
   static Future<void> saveUser(String email, String password) async {
     final filePath = await _getFilePath('user_credentials.json');
@@ -26,21 +31,14 @@ class TempStorageService {
     return null;
   }
 
-// TempStorageService klasėje
+  // =======================
+  // ===== EMPLOYEES ======
   static Future<void> saveEmployeeData(String name, String surname) async {
-    // Gauti dabartinius darbuotojų duomenis
     List<Map<String, String>> employees = await getData();
-
-    // Pridėti naują darbuotoją į sąrašą
     employees.add({'name': name, 'surname': surname});
-
-    // Išsaugoti atnaujintą darbuotojų sąrašą
     await saveData(employees);
   }
 
-
-  // =======================
-// ===== EMPLOYEES ======
   static Future<void> saveData(List<Map<String, String>> employees) async {
     final filePath = await _getFilePath('employees.json');
     final file = File(filePath);
@@ -57,7 +55,6 @@ class TempStorageService {
     }
     return [];
   }
-
 
   // =======================
   // ===== DAILY TASK =====
@@ -93,18 +90,15 @@ class TempStorageService {
   }
 
   // =======================
-// ===== MULTIPLE REPORTS =====
-
-// Prideda naują ataskaitą su timestamp
+  // ===== MULTIPLE REPORTS =====
   static Future<void> addNewReport(String reportText) async {
-    final filePath = await _getFilePath('multiple_reports.json');
-    final file = File(filePath);
-
-    List<Map<String, dynamic>> reports = [];
+    final file = await _getFile('multiple_reports.json');
+    List<Map<String, dynamic>> existingReports = [];
 
     if (await file.exists()) {
       final content = await file.readAsString();
-      reports = List<Map<String, dynamic>>.from(jsonDecode(content));
+      final List<dynamic> jsonList = jsonDecode(content);
+      existingReports = jsonList.map((e) => Map<String, dynamic>.from(e)).toList();
     }
 
     final newReport = {
@@ -112,22 +106,18 @@ class TempStorageService {
       'text': reportText,
     };
 
-    reports.add(newReport);
-    await file.writeAsString(jsonEncode(reports));
+    existingReports.add(newReport);
+    await file.writeAsString(jsonEncode(existingReports));
   }
 
-// Grąžina visas ataskaitas (jei nėra – grąžina tuščią sąrašą)
+  // Grąžina visas ataskaitas (jei nėra – grąžina tuščią sąrašą)
   static Future<List<Map<String, dynamic>>> getAllReports() async {
-    final filePath = await _getFilePath('multiple_reports.json');
-    final file = File(filePath);
-
-    if (await file.exists()) {
-      final content = await file.readAsString();
-      return List<Map<String, dynamic>>.from(jsonDecode(content));
-    }
-    return [];
+    final file = await _getFile('multiple_reports.json');
+    if (!await file.exists()) return [];
+    final content = await file.readAsString();
+    final List<dynamic> jsonList = jsonDecode(content);
+    return jsonList.map((e) => Map<String, dynamic>.from(e)).toList();
   }
-
 
   // =======================
   // ===== REPORT FORM =====
@@ -145,9 +135,10 @@ class TempStorageService {
     }
     return null;
   }
+
+  // Ištrina visus failus
   static Future<void> clearAll() async {
     final dir = await getApplicationDocumentsDirectory();
-
     final files = [
       'employees.json',
       'daily_description.txt',
@@ -163,6 +154,7 @@ class TempStorageService {
     }
   }
 }
+
 
 
 

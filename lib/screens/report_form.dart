@@ -51,12 +51,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     );
   }
 
-
+  // Peržiūros funkcija
   Future<void> _previewReport() async {
     final employees = await TempStorageService.getData();
     final description = await TempStorageService.getDailyDescription();
     final photos = await TempStorageService.getPhotos();
-    final reportText = _reportController.text.trim();
+    final allReports = await TempStorageService.getAllReports(); // ← paimk visas ataskaitas
 
     showDialog(
       context: context,
@@ -75,8 +75,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               const Text('🖼️ Nuotraukos:', style: TextStyle(fontWeight: FontWeight.bold)),
               Text('${photos.length} nuotraukos (-ų)'),
               const SizedBox(height: 12),
-              const Text('📄 Ataskaita:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(reportText.isNotEmpty ? reportText : 'Nėra'),
+              const Text('📄 Ataskaitos:', style: TextStyle(fontWeight: FontWeight.bold)),
+              ...allReports.map((r) => Text('- $r')),
             ],
           ),
         ),
@@ -90,6 +90,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     );
   }
 
+  // Siuntimo funkcija
   Future<void> _sendReport() async {
     // Parodykite siuntimo pranešimą
     showDialog(
@@ -125,7 +126,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -172,6 +172,27 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   filled: true,
                   fillColor: Color(0x80504343),
                   border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              ElevatedButton.icon(
+                onPressed: _addToMultipleReports,
+                icon: const Icon(Icons.add),
+                label: const Text('Pridėti ataskaitą'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                  elevation: 5,
+                  backgroundColor: Colors.green,
+                  shadowColor: Colors.black54,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
 
@@ -228,26 +249,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               const SizedBox(height: 10),
 
               ElevatedButton.icon(
-                onPressed: _addToMultipleReports,
-                icon: const Icon(Icons.add),
-                label: const Text('Pridėti ataskaitą'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
-                  elevation: 5,
-                  backgroundColor: Colors.green,
-                  shadowColor: Colors.black54,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -270,7 +271,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                   ),
                 ),
               ),
-
             ],
           ),
         ),
@@ -278,12 +278,3 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     );
   }
 }
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Nepamiršk pridėti šito pubspec.yaml faile
 import 'package:dienos_darbai/services/temp_storage_service.dart';
 
 class ReportsReviewScreen extends StatefulWidget {
@@ -18,12 +19,25 @@ class _ReportsReviewScreenState extends State<ReportsReviewScreen> {
   }
 
   Future<void> _loadReports() async {
-    // Paimkite visus ataskaitų duomenis iš TempStorageService
     final reports = await TempStorageService.getAllReports();
 
-    // Konvertuokite List<Map<String, dynamic>> į List<String>, jei norite tik tekstinius duomenis
+    final formatter = DateFormat('yyyy-MM-dd HH:mm');
+
     setState(() {
-      _reports = reports.map((report) => report['report_text'].toString()).toList();
+      _reports = reports.map((report) {
+        final dynamic timestampRaw = report['timestamp'];
+
+        // Patikriname ar tai String, jei ne, priskiriam tuščią
+        final timestampString = timestampRaw is String ? timestampRaw : '';
+
+        final dateTime = DateTime.tryParse(timestampString) ?? DateTime.now();
+        final formattedTime = formatter.format(dateTime);
+
+        final dynamic textRaw = report['text'];
+        final text = textRaw is String ? textRaw : '';
+
+        return '$formattedTime\n$text';
+      }).toList();
     });
   }
 
@@ -34,12 +48,20 @@ class _ReportsReviewScreenState extends State<ReportsReviewScreen> {
       body: ListView.builder(
         itemCount: _reports.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_reports[index]),
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                _reports[index],
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
           );
         },
       ),
     );
   }
 }
+
 
