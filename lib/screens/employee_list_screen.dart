@@ -88,13 +88,19 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (employees.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Pirmiausia pridėkite darbuotojus.')),
                   );
                   return;
+                }
+
+                // Išsaugome darbuotojų duomenis naudodami TempStorageService
+                for (var employee in employees) {
+                  await TempStorageService.saveEmployeeData(employee['name']!, employee['surname']!);
                 }
 
                 // Pereiti į ReportFormScreen ir perduoti darbuotojų sąrašą
@@ -107,7 +113,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               child: const Text('Išsaugoti darbuotojus ir pereiti į ataskaitą'),
-            ),
+            )
+
           ],
         ),
       ),
