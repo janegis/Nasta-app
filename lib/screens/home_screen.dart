@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'report_form.dart'; // Prijungiame ataskaitos formą
+import 'package:dienos_darbai/screens/report_form.dart';
 import 'employee_list_screen.dart';
 import 'daily_task_screen.dart';
 
@@ -79,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ReportFormScreen()),
+                    MaterialPageRoute(builder: (context) => ReportFormScreen(employees:[])),
                   );
                 },
                 icon: const Icon(Icons.note_add, size: 24), // Add an icon for clarity

@@ -5,10 +5,13 @@ import 'package:dienos_darbai/screens/reports_review_screen.dart';  // Tikslus k
 
 
 class ReportFormScreen extends StatefulWidget {
-  const ReportFormScreen({super.key});
+  final List<Map<String, String>> employees;
+
+  const ReportFormScreen({super.key, required this.employees});
 
   @override
   State<ReportFormScreen> createState() => _ReportFormScreenState();
+
 }
 
 class _ReportFormScreenState extends State<ReportFormScreen> {
